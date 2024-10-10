@@ -39,9 +39,9 @@
 
                 <div class="section-menu-left">
                     <div class="box-logo">
-                        <a href="{{route('admin.index')}}" id="site-logo-inner">
-                            <img class="" id="logo_header" alt="" src="{{asset('images/logo/logo.png')}}"
-                                data-light="{{asset('images/logo/logo.png')}}" data-dark="{{asset('images/logo/logo.png')}}">
+                        <a href="{{ route('admin.index') }}" id="site-logo-inner">
+                            <img class="" id="logo_header_1" alt="" src="{{ asset('images/logo/logo.png') }}"
+                                data-light="{{ asset('images/logo/logo.png') }}" data-dark="{{ asset('images/logo/logo.png') }}">
                         </a>
                         <div class="button-show-hide">
                             <i class="icon-menu-left"></i>
@@ -164,7 +164,8 @@
                                 <li class="menu-item">
                                     <form method="POST" action="{{route('logout')}}" id="logout-form">
                                         @csrf
-                                        <a href="{{route('logout')}}" class="" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                        <a href="{{route('logout')}}" class=""
+                                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                             <div class="icon"><i class="icon-settings"></i></div>
                                             <div class="text">Logout</div>
                                         </a>

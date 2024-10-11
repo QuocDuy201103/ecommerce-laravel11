@@ -47,33 +47,38 @@ class AdminController extends Controller
         $brand->save();
         return redirect()->route('admin.brands')->with('status', 'Brand has been added succesfuly!');
     }
-    // public function brand_store(Request $request)
-    // {
-    //     // Sửa quy tắc xác thực
-    //     $request->validate([
-    //         'name' => 'required',
-    //         'image' => 'image|mimes:png,jpg,jpeg|max:2048',
-    //     ]);
 
-    //     $brand = new Brand();
-    //     $brand->name = $request->name;
-    //     $brand->slug = Str::slug($request->name);
+    public function edit_brand($id)
+    {
+        $brand = Brand::find($id);
+        return view('admin.brand-edit', compact('brand'));
+    }
 
-    //     if ($request->hasFile('image')) {
-    //         $image = $request->file('image');
-    //         $file_extension = $image->extension();
-    //         $file_name = Carbon::now()->timestamp . '_' . uniqid() . '.' . $file_extension;
+    public function update_brand(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'slug' => 'required|unique:brands,slug',
+            'image' => 'mimes:png,jpg,jpeg|max:2048'
+        ]);
 
-    //         if ($this->GenerateBrandThumbnailsImage($image, $file_name)) {
-    //             $brand->image = $file_name;
-    //         } else {
-    //             // Xử lý lỗi khi lưu hình ảnh
-    //             return redirect()->back()->with('error', 'Failed to upload brand image.');
-    //         }
-    //     }
-    //     $brand->save();
-    //     return redirect()->route('admin.brands')->with('status', 'Brand has been added successfully');
-    // }
+        $brand = Brand::find($request->id);
+        $brand->name = $request->name;
+        $brand->slug = Str::slug($request->name);
+        if ($request->hasFile('image')) {
+            if (File::exists(public_path(('uploads/brands')) . '/' . $brand->image)) {
+                File::delete(public_path(('uploads/brands')) . '/' . $brand->image);
+            }
+            $image = $request->file('image');
+            $file_extension = $request->file('image')->extension();
+            $file_name = Carbon::now()->timestamp . '.' . $file_extension;
+            $this->GenerateBrandThumbnailsImage($image, $file_name);
+            $brand->image = $file_name;
+        }
+
+        $brand->save();
+        return redirect()->route('admin.brands')->with('status', 'Brand has been updated succesfuly!');
+    }
 
     public function GenerateBrandThumbnailsImage($image, $imageName)
     {
@@ -84,27 +89,4 @@ class AdminController extends Controller
             $constrain->aspectRatio();
         })->save($destinationPath . '/' . $imageName);
     }
-    
-    
-
-    // public function GenerateBrandThumbnailsImage($image, $imageName)
-    // {
-    //     try {
-    //         $destinationPath = public_path('uploads/brands');
-
-    //         if (!File::exists($destinationPath)) {
-    //             File::makeDirectory($destinationPath, 0755, true);
-    //         }
-    //         $img = Image::make($image->getRealPath());
-    //         $img->fit(124, 124, function ($constraint) {
-    //             $constraint->upsize();
-    //         }, 'center');
-    //         $img->save($destinationPath . '/' . $imageName);
-
-    //         return true;
-    //     } catch (\Exception $e) {
-    //         \Log::error('Error generating brand thumbnail: ' . $e->getMessage());
-    //         return false;
-    //     }
-    // }
 }

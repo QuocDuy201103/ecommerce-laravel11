@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Brand;
@@ -190,5 +191,12 @@ class AdminController extends Controller
         })->save($destinationPath . '/' . $imageName);
     }
 
+
+    //product
+    public function products(){
+        $products = Product::orderBy('created_at', 'DESC')->paginate(10);
+        return view('admin.products', compact('products'));
+
+    }
 
 }

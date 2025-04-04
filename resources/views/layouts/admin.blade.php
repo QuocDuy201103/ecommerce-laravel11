@@ -41,7 +41,8 @@
                     <div class="box-logo">
                         <a href="{{ route('admin.index') }}" id="site-logo-inner">
                             <img class="" id="logo_header_1" alt="" src="{{ asset('images/logo/logo.png') }}"
-                                data-light="{{ asset('images/logo/logo.png') }}" data-dark="{{ asset('images/logo/logo.png') }}">
+                                data-light="{{ asset('images/logo/logo.png') }}"
+                                data-dark="{{ asset('images/logo/logo.png') }}">
                         </a>
                         <div class="button-show-hide">
                             <i class="icon-menu-left"></i>
@@ -68,7 +69,7 @@
                                     </a>
                                     <ul class="sub-menu">
                                         <li class="sub-menu-item">
-                                            <a href="add-product.html" class="">
+                                            <a href="{{route('admin.product.add')}}" class="">
                                                 <div class="text">Add Product</div>
                                             </a>
                                         </li>

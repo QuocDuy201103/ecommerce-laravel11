@@ -14,11 +14,17 @@ class ShopController extends Controller
         return view('shop', data: compact('products'));
     }
 
-    public function show($slug)
+    public  function product_details($product_slug)
     {
-        $product = Product::where('slug', $slug)->firstOrFail();
-        return view('product', data: compact('product'));
+        $product = Product::where('slug', $product_slug)->firstOrFail();
+        $related_products = Product::where('slug', '<>', $product_slug)
+            ->where('category_id', $product->category_id)
+            ->orderBy('created_at', 'DESC')
+            ->take(8)
+            ->get();
+        return view('details', compact('product', 'related_products'));
     }
+
 
     public function category($slug)
     {

@@ -41,6 +41,8 @@ class ShopController extends Controller
         $f_brands = $request->query('brands') ? $request->query('brands') : "";
         $categories = Category::orderBy('name', 'ASC')->get();
         $f_categories = $request->query('categories') ? $request->query('categories') : "";
+        $min_price = $request->query('min_price') ? $request->query('min_price') : 1;
+        $max_price = $request->query('max_price') ? $request->query('max_price') : 10000000;
         $products = Product::where(function ($query) use ($f_brands) {
             if ($f_brands != "") {
                 $query->whereIn('brand_id', explode(',', $f_brands))->orWhereRaw("'" . $f_brands . "'=''");
@@ -52,8 +54,12 @@ class ShopController extends Controller
                     $query->whereIn('category_id', explode(',', $f_categories))->orWhereRaw("'" . $f_categories . "'=''");
                 }
             })
+            ->where(function ($query) use ($min_price, $max_price) {
+                $query->whereBetween('regular_price', [$min_price, $max_price])
+                    ->orWhereBetween('sale_price', [$min_price, $max_price]);
+            })
             ->orderBy($o_column, $o_oder)->paginate($size);
-        return view('shop', data: compact('products', 'size', 'order', 'o_column', 'o_oder', 'brands', 'f_brands', 'categories', 'f_categories'));
+        return view('shop', data: compact('products', 'size', 'order', 'o_column', 'o_oder', 'brands', 'f_brands', 'categories', 'f_categories', 'min_price', 'max_price'));
     }
 
     public function product_details($product_slug)

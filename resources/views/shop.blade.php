@@ -37,6 +37,9 @@
             min-width: 30px;
             text-align: right;
         }
+        .filled-heart{
+            color: orange;
+        }
     </style>
 
     <main class="pt-90">
@@ -216,17 +219,17 @@
                         </h5>
                         <div id="accordion-filter-price" class="accordion-collapse collapse show border-0"
                             aria-labelledby="accordion-heading-price" data-bs-parent="#price-filters">
-                            <input class="price-range-slider" type="text" name="price_range" value="" data-slider-min="10"
-                                data-slider-max="1000" data-slider-step="5" data-slider-value="[250,450]"
-                                data-currency="$" />
+                            <input class="price-range-slider" type="text" name="price_range" value="" data-slider-min="1"
+                                data-slider-max="10000000" data-slider-step="5"
+                                data-slider-value="[{{$min_price}},{{$max_price}}]" data-currency="$" />
                             <div class="price-range__info d-flex align-items-center mt-2">
                                 <div class="me-auto">
                                     <span class="text-secondary">Min Price: </span>
-                                    <span class="price-range__min">$250</span>
+                                    <span class="price-range__min">$1</span>
                                 </div>
                                 <div>
                                     <span class="text-secondary">Max Price: </span>
-                                    <span class="price-range__max">$450</span>
+                                    <span class="price-range__max">$10000000</span>
                                 </div>
                             </div>
                         </div>
@@ -236,18 +239,18 @@
 
             <div class="shop-list flex-grow-1">
                 <div class="swiper-container js-swiper-slider slideshow slideshow_small slideshow_split" data-settings='{
-                                                    "autoplay": {
-                                                      "delay": 5000
-                                                    },
-                                                    "slidesPerView": 1,
-                                                    "effect": "fade",
-                                                    "loop": true,
-                                                    "pagination": {
-                                                      "el": ".slideshow-pagination",
-                                                      "type": "bullets",
-                                                      "clickable": true
-                                                    }
-                                                  }'>
+                                                        "autoplay": {
+                                                          "delay": 5000
+                                                        },
+                                                        "slidesPerView": 1,
+                                                        "effect": "fade",
+                                                        "loop": true,
+                                                        "pagination": {
+                                                          "el": ".slideshow-pagination",
+                                                          "type": "bullets",
+                                                          "clickable": true
+                                                        }
+                                                      }'>
                     <div class="swiper-wrapper">
                         <div class="swiper-slide">
                             <div class="slide-split h-100 d-block d-md-flex overflow-hidden">
@@ -476,14 +479,30 @@
                                         <span class="reviews-note text-lowercase text-secondary ms-1">8k+ reviews</span>
                                     </div>
 
-                                    <button
-                                        class="pc__btn-wl position-absolute top-0 end-0 bg-transparent border-0 js-add-wishlist"
-                                        title="Add To Wishlist">
-                                        <svg width="16" height="16" viewBox="0 0 20 20" fill="none"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <use href="#icon_heart" />
-                                        </svg>
-                                    </button>
+                                    @if(Cart::instance('wishlist')->content()->where('id', $product->id)->count() == 0)
+                                        <form action="{{ route('wishlist.add') }}" method="post">
+                                            @csrf
+                                            <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                            <input type="hidden" name="name" value="{{ $product->name }}">
+                                            <input type="hidden" name="price" value="{{ $product->sale_price ?? $product->regular_price }}">
+                                            <input type="hidden" name="quantity" value="1">
+                                            <button type="submit" class="pc__btn-wl position-absolute top-0 end-0 bg-transparent border-0 js-add-wishlist" title="Add To Wishlist">
+                                                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <use href="#icon_heart" />
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    @else
+                                        <form action="{{ route('wishlist.remove', ['rowId' => Cart::instance('wishlist')->content()->where('id', $product->id)->first()->rowId]) }}" method="post">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="pc__btn-wl position-absolute top-0 end-0 bg-transparent border-0 js-add-wishlist filled-heart" title="Remove From Wishlist">
+                                                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <use href="#icon_heart" />
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -503,8 +522,10 @@
         <input type="hidden" name="page" value="{{ $products->currentPage() }}">
         <input type="hidden" name="size" id="size" value="{{ $size }}">
         <input type="hidden" name="order" id="order" value="{{ $order }}">
-        <input type="hidden" name="brands" id="hdn-brands" >
+        <input type="hidden" name="brands" id="hdn-brands">
         <input type="hidden" name="categories" id="hdn-categories">
+        <input type="hidden" name="min_price" id="min-price" value="{{ $min_price }}">
+        <input type="hidden" name="max_price" id="max-price" value="{{ $max_price }}">
     </form>
 @endsection
 
@@ -545,6 +566,16 @@
                 });
                 $('#hdn-categories').val(categories);
                 $('#frm-filter').submit();
+            });
+
+            $("input[name='price_range']").on('change', function () {
+                var min = $(this).val().split(',')[0];
+                var max = $(this).val().split(',')[1];
+                $('#min-price').val(min);
+                $('#max-price').val(max);
+                setTimeout(function () {
+                    $('#frm-filter').submit();
+                }, 2000);
             });
         });
     </script>

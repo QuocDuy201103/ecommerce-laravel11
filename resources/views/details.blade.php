@@ -1,7 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
-
+    <style>
+        .filled-heart{
+            color: orange;
+        }
+    </style>
     <main class="pt-90">
         <div class="mb-md-1 pb-md-3"></div>
         <section class="product-single container">
@@ -142,13 +146,35 @@
                         </form>
                     @endif
                     <div class="product-single__addtolinks">
-                        <a href="#" class="menu-link menu-link_us-s add-to-wishlist"><svg width="16" height="16"
-                                viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <use href="#icon_heart" />
-                            </svg><span>Add to Wishlist</span></a>
+                        @if(Cart::instance('wishlist')->content()->where('id', $product->id)->count() == 0)
+                            <form action="{{ route('wishlist.add') }}" method="post">
+                                @csrf
+                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                <input type="hidden" name="name" value="{{ $product->name }}">
+                                <input type="hidden" name="price" value="{{ $product->sale_price ?? $product->regular_price }}">
+                                <input type="hidden" name="quantity" value="1">
+                                <a href="javascript:void(0)" onclick="this.closest('form').submit()" class="menu-link menu-link_us-s add-to-wishlist">
+                                    <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <use href="#icon_heart" />
+                                    </svg>
+                                    <span>Add to Wishlist</span>
+                                </a>
+                            </form>
+                        @else
+                            <form action="{{ route('wishlist.remove', ['rowId' => Cart::instance('wishlist')->content()->where('id', $product->id)->first()->rowId]) }}" method="post">
+                                @csrf
+                                @method('DELETE')
+                                <a href="javascript:void(0)" onclick="this.closest('form').submit()" class="menu-link menu-link_us-s add-to-wishlist filled-heart">
+                                    <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <use href="#icon_heart" />
+                                    </svg>
+                                    <span>Remove from Wishlist</span>
+                                </a>
+                            </form>
+                        @endif
                         <share-button class="share-button">
                             <button
-                                class="menu-link menu-link_us-s to-share border-0 bg-transparent d-flex align-items-center">
+                                class="menu-link menu-link_us-s to-share border-0 bg-transparent d-flex align-items-center p-0">
                                 <svg width="16" height="19" viewBox="0 0 16 19" fill="none"
                                     xmlns="http://www.w3.org/2000/svg">
                                     <use href="#icon_sharing" />
@@ -318,7 +344,7 @@
                         </div>
                         <div class="product-single__review-form">
                             <form name="customer-review-form">
-                                <h5>Be the first to review “Message Cotton T-Shirt”</h5>
+                                <h5>Be the first to review "Message Cotton T-Shirt"</h5>
                                 <p>Your email address will not be published. Required fields are marked *</p>
                                 <div class="select-star-rating">
                                     <label>Your rating *</label>

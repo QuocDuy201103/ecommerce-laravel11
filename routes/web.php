@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\WishListController;
+use App\Http\Controllers\CouponController;
 use App\Http\Middleware\AuthAdmin;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
@@ -32,12 +33,13 @@ Route::delete('/wishlist/remove/{rowId}', [WishListController::class, 'remove_fr
 Route::delete('/wishlist/clear', [WishListController::class, 'clear_wishlist'])->name('wishlist.clear');
 Route::post('/wishlist/add-to-cart/{rowId}', [WishListController::class, 'wishlist_to_cart'])->name('wishlist.add_to_cart');
 
+
 //account route
-Route::middleware(['auth'])->group(function(){
+Route::middleware(['auth'])->group(function () {
     Route::get('/account-dashboard', [UserController::class, 'index'])->name('user.index');
 });
 
-Route::middleware(['auth',AuthAdmin::class])->group(function(){
+Route::middleware(['auth', AuthAdmin::class])->group(function () {
     //route brands
     Route::get('/admin', [AdminController::class, 'index'])->name('admin.index');
     Route::get('/admin/brands', [AdminController::class, 'brands'])->name('admin.brands');
@@ -58,13 +60,18 @@ Route::middleware(['auth',AuthAdmin::class])->group(function(){
     //products route
     Route::get('/admin/products', [AdminController::class, 'products'])->name('admin.products');
     Route::get('/admin/product/add', [AdminController::class, 'add_product'])->name('admin.product.add');
-    Route::post('/admin/product/store',[AdminController::class,'product_store'])->name('admin.product.store');
+    Route::post('/admin/product/store', [AdminController::class, 'product_store'])->name('admin.product.store');
     Route::get('/admin/products/{id}/edit', [AdminController::class, 'edit_product'])->name('admin.products.edit');
     Route::put('/admin/products/{id}', [AdminController::class, 'update_product'])->name('admin.products.update');
     Route::delete('/admin/products/{id}', [AdminController::class, 'delete_product'])->name('admin.products.delete');
 
     //shop route
-    Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
-    Route::get('/shop/{slug}', [ShopController::class, 'show'])->name('shop.show');
-    Route::get('/shop/category/{slug}', [ShopController::class, 'category'])->name('shop.category');
+    // Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
+    // Route::get('/shop/{slug}', [ShopController::class, 'show'])->name('shop.show');
+    // Route::get('/shop/category/{slug}', [ShopController::class, 'category'])->name('shop.category');
+
+    //coupon route
+    Route::get('/admin/coupons', [AdminController::class, 'coupons'])->name('admin.coupons');
+    Route::get('/admin/coupons/add', [AdminController::class, 'add_coupon'])->name('admin.coupons.add');
+    Route::post('/admin/coupons/store', [AdminController::class, 'coupon_store'])->name('admin.coupons.store');
 });
